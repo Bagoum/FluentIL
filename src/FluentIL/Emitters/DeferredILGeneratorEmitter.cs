@@ -462,7 +462,18 @@ namespace FluentIL.Emitters
                         return;
                     }
 
-                    WriteLine("{0}({1})", con.Name, string.Join(", ", con.GetParameters().Select(p => $"{p.ParameterType} {p.Name}")));
+#if !NETSTANDARD1_6
+                    if (con.DeclaringType is TypeBuilder tb && !tb.IsCreated())
+                    {
+                        WriteLine("(Incomplete constructor call for {0})", tb.Name);
+                    }
+                    else
+                    {
+#endif
+                        WriteLine("{0}({1})", con.Name, string.Join(", ", con.GetParameters().Select(p => $"{p.ParameterType} {p.Name}")));
+#if !NETSTANDARD1_6
+                    }
+#endif
                 });
 
             return this;
